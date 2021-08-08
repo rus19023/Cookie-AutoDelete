@@ -133,6 +133,14 @@ export const initialState: State = {
       name: SettingID.OLD_WHITE_CLEAN_LOCALSTORAGE,
       value: false,
     },
+    [SettingID.TEXT_GREY]: {
+      name: SettingID.TEXT_GREY,
+      value: '',
+    },
+    [SettingID.TEXT_WHITE]: {
+      name: SettingID.TEXT_WHITE,
+      value: '',
+    },
   },
   activityLog: [],
   cache: {},

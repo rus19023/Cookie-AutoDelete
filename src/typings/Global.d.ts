@@ -108,6 +108,8 @@ declare const enum SettingID {
   SIZE_POPUP = 'sizePopup',
   SIZE_SETTING = 'sizeSetting',
   STAT_LOGGING = 'statLogging',
+  TEXT_GREY = 'textGrey',
+  TEXT_WHITE = 'textWhite',
 }
 
 declare const enum ListType {

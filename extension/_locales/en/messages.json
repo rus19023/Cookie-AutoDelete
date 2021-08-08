@@ -273,6 +273,10 @@
     "message": "Edit expression",
     "description": "Edit expression"
   },
+  "editSettingText": {
+    "message": "Edit Setting",
+    "description": "Edit Setting"
+  },
   "enableAutoDeleteText": {
     "message": "Toggle to enable automatic cleanup (automatic mode)",
     "description": "Toggle to enable automatic cleanup (automatic mode)"
@@ -979,6 +983,10 @@
     "message": "Save expression",
     "description": "Save expression"
   },
+  "saveSettingText": {
+    "message": "Save This Setting",
+    "description": "Save This Setting"
+  },
   "secondsText": {
     "message": "second(s)",
     "description": "second(s)"
@@ -1114,5 +1122,15 @@
   "whiteListWordText": {
     "message": "Whitelist",
     "description": "Whitelist"
+  },
+  "visualTextChangeText": {
+    "message": "Override Visual Text for: $listType$",
+    "description": "Override Visual Text for: $listType$.  Shown in Settings.",
+    "placeholders": {
+      "listType": {
+        "content": "$1",
+        "example": "GreyList -or- WhiteList"
+      }
+    }
   }
 }

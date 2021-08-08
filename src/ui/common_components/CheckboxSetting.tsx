@@ -51,6 +51,7 @@ const CheckboxSetting: React.FunctionComponent<OwnProps> = ({
           icon={['far', value ? 'check-square' : 'square']}
           role="checkbox"
           aria-checked={value as boolean}
+          tabIndex={0}
         />
         <label htmlFor={name} aria-labelledby={name}>
           {text}

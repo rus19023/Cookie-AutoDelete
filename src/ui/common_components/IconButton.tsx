@@ -67,6 +67,7 @@ export default class IconButton extends React.Component<IconButtonProps> {
           margin: '0 2px',
           ...styleReact,
         }}
+        tabIndex={0}
       >
         <FontAwesomeIcon
           style={

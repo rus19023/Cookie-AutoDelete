@@ -20,11 +20,13 @@ import {
   isChrome,
   isFirefox,
   isFirefoxNotAndroid,
+  sleep,
 } from '../../../services/Libs';
 import { ReduxAction } from '../../../typings/ReduxConstants';
 import CheckboxSetting from '../../common_components/CheckboxSetting';
 import IconButton from '../../common_components/IconButton';
 import SelectInput from '../../common_components/SelectInput';
+import TextInputEditable from '../../common_components/TextInputEditable';
 import { downloadObjectAsJSON } from '../../UILibs';
 import SettingsTooltip from './SettingsTooltip';
 
@@ -56,13 +58,17 @@ interface DispatchProps {
 
 type SettingProps = OwnProps & StateProps & DispatchProps;
 
-class InitialState {
+class EmptyState {
   public error = '';
   public success = '';
+  public defaultText = '';
+  public editType: SettingID | null = null;
+  public editText = '';
 }
 
 class Settings extends React.Component<SettingProps> {
-  public state = new InitialState();
+  private editInput: HTMLInputElement | undefined | null;
+  public state = new EmptyState();
 
   // Import Settings
   public importCoreSettings(importFile: File) {
@@ -106,14 +112,12 @@ class Settings extends React.Component<SettingProps> {
         // https://stackoverflow.com/questions/35789498/new-typescript-1-8-4-build-error-build-property-result-does-not-exist-on-t
         const target: FileReader = file.target;
         const result: string = target.result as string;
-        const jsonImport: { [k: string]: Record<string, unknown> } = JSON.parse(
-          result,
-        );
+        const jsonImport: { [k: string]: Record<string, unknown> } =
+          JSON.parse(result);
         if (!jsonImport.settings) {
           cadLog(
             {
-              msg:
-                'importCoreSettings:  Imported JSON does not have "settings" array',
+              msg: 'importCoreSettings:  Imported JSON does not have "settings" array',
               x: jsonImport,
             },
             debug,
@@ -130,13 +134,12 @@ class Settings extends React.Component<SettingProps> {
           return;
         }
         // from { name, value } to name:{ name, value }
-        const newSettings: MapToSettingObject = ((jsonImport.settings as unknown) as Setting[]).reduce(
-          (a: { [k: string]: Setting }, c: Setting) => {
-            a[c.name] = c;
-            return a;
-          },
-          {},
-        );
+        const newSettings: MapToSettingObject = (
+          jsonImport.settings as unknown as Setting[]
+        ).reduce((a: { [k: string]: Setting }, c: Setting) => {
+          a[c.name] = c;
+          return a;
+        }, {});
         const settingKeys = Object.keys(newSettings);
         const unknownKeys = settingKeys.filter(
           (key) => !initialSettingKeys.includes(key),
@@ -208,14 +211,65 @@ class Settings extends React.Component<SettingProps> {
     });
   }
 
+  public startEditing(sid: SettingID, def: string) {
+    this.setState({
+      defaultText: def,
+      editType: sid,
+      editText: decodeURIComponent(this.props.settings[sid].value.toString()),
+    });
+  }
+
+  public commitEdit() {
+    const et = this.state.editType;
+    if (!et) return;
+    let inputTrim = encodeURIComponent(this.state.editText.trim());
+    if (inputTrim === this.state.defaultText) {
+      inputTrim = '';
+    }
+    if (inputTrim !== this.props.settings[et].value.toString()) {
+      this.props.onUpdateSetting({
+        name: et,
+        value: inputTrim,
+      });
+    }
+    sleep(200).then(() => {
+      this.clearEdit();
+    });
+  }
+
+  public clearEdit() {
+    this.editInput = undefined;
+    this.setState(new EmptyState());
+  }
+
+  public genEditableTextSetting(sid: SettingID, def: string, label?: string) {
+    return (
+      <TextInputEditable
+        altEditClear={browser.i18n.getMessage('stopEditingText')}
+        altEditSave={browser.i18n.getMessage('saveSettingText')}
+        altEditStart={browser.i18n.getMessage('editSettingText')}
+        canEdit={this.state.editType === sid}
+        defaultText={def}
+        editValue={this.state.editText}
+        ref={(c) => (this.editInput = c)}
+        name={sid}
+        onChange={(e) =>
+          this.setState({
+            editText: e.target.value,
+          })
+        }
+        onEditClear={() => this.clearEdit()}
+        onEditSave={() => this.commitEdit()}
+        onEditStart={() => this.startEditing(sid, def)}
+        text={label}
+        value={this.props.settings[sid].value.toString()}
+      />
+    );
+  }
+
   public render() {
-    const {
-      cache,
-      onResetButtonClick,
-      onUpdateSetting,
-      settings,
-      style,
-    } = this.props;
+    const { cache, onResetButtonClick, onUpdateSetting, settings, style } =
+      this.props;
     const { error, success } = this.state;
     return (
       <div style={style}>
@@ -373,16 +427,6 @@ class Settings extends React.Component<SettingProps> {
               updateSetting={(payload) => onUpdateSetting(payload)}
             />
             <SettingsTooltip hrefURL={'#clean-all-expired-cookies'} />
-          </div>
-        </fieldset>
-        <hr />
-        <fieldset>
-          <legend>{browser.i18n.getMessage('settingGroupExpression')}</legend>
-          <div className="alert alert-info">
-            {browser.i18n.getMessage('groupExpressionDefaultNotice', [
-              browser.i18n.getMessage('expressionListText'),
-            ])}{' '}
-            <SettingsTooltip hrefURL={'#default-expression-options'} />
           </div>
         </fieldset>
         <hr />
@@ -628,6 +672,34 @@ class Settings extends React.Component<SettingProps> {
               <SettingsTooltip hrefURL={'#enable-context-menus'} />
             </div>
           )}
+          <div className="form-group row">
+            <div
+              className="col-xs-12 col-md-6"
+              style={{ marginBottom: '0.5em' }}
+            >
+              {this.genEditableTextSetting(
+                SettingID.TEXT_GREY,
+                browser.i18n.getMessage('greyListWordText'),
+                browser.i18n.getMessage(
+                  'visualTextChangeText',
+                  browser.i18n.getMessage('greyListWordText'),
+                ),
+              )}
+            </div>
+            <div
+              className="col-xs-12 col-md-6"
+              style={{ marginBottom: '0.5em' }}
+            >
+              {this.genEditableTextSetting(
+                SettingID.TEXT_WHITE,
+                browser.i18n.getMessage('whiteListWordText'),
+                browser.i18n.getMessage(
+                  'visualTextChangeText',
+                  browser.i18n.getMessage('whiteListWordText'),
+                ),
+              )}
+            </div>
+          </div>
           {(isFirefoxNotAndroid(cache) || isChrome(cache)) && (
             <div className="form-group">
               <CheckboxSetting

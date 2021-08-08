@@ -66,6 +66,8 @@ const settingOrder = [
   SettingID.SIZE_POPUP,
   SettingID.SIZE_SETTING,
   SettingID.CONTEXT_MENUS,
+  SettingID.TEXT_GREY,
+  SettingID.TEXT_WHITE,
   SettingID.DEBUG_MODE,
 ];
 
@@ -238,8 +240,7 @@ class About extends React.Component<AboutProps> {
               cadLog(
                 {
                   type: 'error',
-                  msg:
-                    'Could not find either textarea or span for debugSettings',
+                  msg: 'Could not find either textarea or span for debugSettings',
                 },
                 true,
               );
@@ -249,8 +250,7 @@ class About extends React.Component<AboutProps> {
               cadLog(
                 {
                   type: 'error',
-                  msg:
-                    'Could not get textContent from textarea for debugSettings',
+                  msg: 'Could not get textContent from textarea for debugSettings',
                 },
                 true,
               );

@@ -50,3 +50,10 @@ export const downloadObjectAsJSON = (
     downloadName: downloadNode.getAttribute('download'),
   };
 };
+
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export const moveCaretToEnd = (e: any): void => {
+  const tempValue = e.target.value;
+  e.target.value = '';
+  e.target.value = tempValue;
+};

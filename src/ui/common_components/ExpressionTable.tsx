@@ -13,11 +13,13 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
+import shortid from 'shortid';
 import { removeExpressionUI, updateExpressionUI } from '../../redux/Actions';
-import { validateExpressionDomain } from '../../services/Libs';
+import { sleep, validateExpressionDomain } from '../../services/Libs';
 import { ReduxAction } from '../../typings/ReduxConstants';
 import ExpressionOptions from './ExpressionOptions';
 import IconButton from './IconButton';
+import TextInputEditable from './TextInputEditable';
 
 class EmptyState {
   public expressionInput = '';
@@ -66,12 +68,6 @@ class ExpressionTable extends Component<ExpressionTableProps, EmptyState> {
     }
   }
 
-  public moveCaretToEnd(e: any) {
-    const tempValue = e.target.value;
-    e.target.value = '';
-    e.target.value = tempValue;
-  }
-
   public clearEdit() {
     if (this.editInput) {
       if (this.editInput.parentElement) {
@@ -96,8 +92,7 @@ class ExpressionTable extends Component<ExpressionTableProps, EmptyState> {
         storeId: this.props.storeId,
       });
     }
-    this.setState(new EmptyState());
-    this.editInput = undefined;
+    sleep(200).then(() => this.clearEdit());
   }
 
   public validateEdit(): boolean {
@@ -160,94 +155,28 @@ class ExpressionTable extends Component<ExpressionTableProps, EmptyState> {
                   }}
                 />
               </td>
-              {editMode && id === expression.id ? (
-                <td className="editableExpression">
-                  <input
-                    ref={(c) => {
-                      this.editInput = c;
-                    }}
-                    className="form-control"
-                    value={expressionInput}
-                    onFocus={this.moveCaretToEnd}
-                    onChange={(e) =>
-                      this.setState({
-                        expressionInput: e.target.value,
-                      })
-                    }
-                    onKeyUp={(e) => {
-                      if (e.key.toLowerCase().includes('enter')) {
-                        this.commitEdit();
-                      } else if (e.key.toLowerCase().includes('escape')) {
-                        this.clearEdit();
-                      }
-                    }}
-                    type="url"
-                    autoFocus={true}
-                    style={{
-                      margin: 0,
-                    }}
-                    formNoValidate={true}
-                  />
-                  <div className="invalid-feedback">{invalid}</div>
-                  <IconButton
-                    title={browser.i18n.getMessage('stopEditingText')}
-                    className="btn-outline-danger"
-                    iconName="ban"
-                    styleReact={{
-                      float: 'left',
-                      marginTop: '8px',
-                      width: '45%',
-                    }}
-                    onClick={() => {
-                      this.clearEdit();
-                    }}
-                  />
-                  <IconButton
-                    title={browser.i18n.getMessage('saveExpressionText')}
-                    className="btn-outline-success"
-                    iconName="save"
-                    styleReact={{
-                      float: 'right',
-                      marginTop: '8px',
-                      width: '45%',
-                    }}
-                    onClick={() => {
-                      this.commitEdit();
-                    }}
-                  />
-                </td>
-              ) : (
-                <td>
-                  <textarea
-                    className="form-control form-control-plaintext"
-                    readOnly={true}
-                    rows={1}
-                    style={{
-                      margin: 0,
-                      overflowX: 'scroll',
-                      paddingLeft: '5px',
-                      paddingRight: '5px',
-                      resize: 'none',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {expression.expression}
-                  </textarea>
-
-                  <IconButton
-                    title={browser.i18n.getMessage('editExpressionText')}
-                    iconName="pen"
-                    className="btn-outline-info showOnRowHover"
-                    styleReact={{
-                      marginTop: '5px',
-                      width: '100%',
-                    }}
-                    onClick={() => {
-                      this.startEditing(expression);
-                    }}
-                  />
-                </td>
-              )}
+              <td className="editableExpression">
+                <TextInputEditable
+                  altEditClear={browser.i18n.getMessage('stopEditingText')}
+                  altEditSave={browser.i18n.getMessage('saveExpressionText')}
+                  altEditStart={browser.i18n.getMessage('editExpressionText')}
+                  canEdit={editMode && id === expression.id}
+                  editValue={expressionInput}
+                  invalidFeedback={invalid}
+                  name={expression.id || shortid.generate()}
+                  onChange={(e) =>
+                    this.setState({
+                      expressionInput: e.target.value,
+                    })
+                  }
+                  onEditClear={() => this.clearEdit()}
+                  onEditSave={() => this.commitEdit()}
+                  onEditStart={() => this.startEditing(expression)}
+                  ref={(c) => (this.editInput = c)}
+                  type="url"
+                  value={expression.expression}
+                />
+              </td>
               <td>
                 <div
                   style={{
