@@ -21,6 +21,7 @@ import {
   isFirefox,
   isFirefoxNotAndroid,
   sleep,
+  visualListTypeDisplay,
 } from '../../../services/Libs';
 import { ReduxAction } from '../../../typings/ReduxConstants';
 import CheckboxSetting from '../../common_components/CheckboxSetting';
@@ -399,7 +400,10 @@ class Settings extends React.Component<SettingProps> {
           </div>
           <div className="form-group">
             <CheckboxSetting
-              text={browser.i18n.getMessage(SettingID.ENABLE_GREYLIST)}
+              text={browser.i18n.getMessage(
+                SettingID.ENABLE_GREYLIST,
+                visualListTypeDisplay(settings, ListType.GREY),
+              )}
               settingObject={settings[SettingID.ENABLE_GREYLIST]}
               inline={true}
               updateSetting={(payload) => onUpdateSetting(payload)}

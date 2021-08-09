@@ -210,8 +210,7 @@ export const getAllCookiesForDomain = async (
     const regExp = new RegExp(hostname.slice(7)); // take out 'file://'
     cadLog(
       {
-        msg:
-          'Libs.getAllCookiesForDomain:  Local File Regex to rest on cookie.path',
+        msg: 'Libs.getAllCookiesForDomain:  Local File Regex to rest on cookie.path',
         x: { partialTabInfo, hostname, regExp: regExp.toString() },
       },
       debug,
@@ -223,8 +222,7 @@ export const getAllCookiesForDomain = async (
     // Firefox Only - FirstPartyIsolation - original method
     cadLog(
       {
-        msg:
-          'Libs.getAllCookiesForDomain:  browser.cookies.getAll for domain (firstPartyIsolation).',
+        msg: 'Libs.getAllCookiesForDomain:  browser.cookies.getAll for domain (firstPartyIsolation).',
         x: {
           partialTabInfo,
           domain: hostname,
@@ -248,8 +246,7 @@ export const getAllCookiesForDomain = async (
     // firstPartyDomain = (https,domain.com)
     cadLog(
       {
-        msg:
-          'Libs.getAllCookiesForDomain:  browser.cookies.getAll for domain (FirstPartyIsolation - use_site).',
+        msg: 'Libs.getAllCookiesForDomain:  browser.cookies.getAll for domain (FirstPartyIsolation - use_site).',
         x: {
           partialTabInfo,
           domain: hostname,
@@ -271,8 +268,7 @@ export const getAllCookiesForDomain = async (
     if (siteURL.port) {
       cadLog(
         {
-          msg:
-            'Libs.getAllCookiesForDomain:  browser.cookies.getAll for domain (FirstPartyIsolation - use_site + port).',
+          msg: 'Libs.getAllCookiesForDomain:  browser.cookies.getAll for domain (FirstPartyIsolation - use_site + port).',
           x: {
             partialTabInfo,
             domain: hostname,
@@ -899,4 +895,33 @@ export const validateExpressionDomain = (input: string): string => {
     return browser.i18n.getMessage('inputErrorSpace');
   }
   return '';
+};
+
+/**
+ * Displays overridden List Type Display Text if found
+ * @param s Setting Object
+ * @param lt ListType as needed
+ * @returns User-defined text or default/translated text.
+ */
+export const visualListTypeDisplay = (
+  s: MapToSettingObject,
+  lt?: ListType,
+): string => {
+  let d = '',
+    n = '',
+    u = '';
+  switch (lt) {
+    case ListType.GREY:
+      n = SettingID.TEXT_GREY;
+      d = 'greyListWordText';
+      break;
+    case ListType.WHITE:
+      n = SettingID.TEXT_WHITE;
+      d = 'whiteListWordText';
+      break;
+    default:
+      d = 'noListText';
+  }
+  if (n) u = decodeURIComponent(s[n].value.toString());
+  return u || browser.i18n.getMessage(d);
 };

@@ -20,6 +20,7 @@ import {
   returnOptionalCookieAPIAttributes,
   siteDataToBrowser,
   throwErrorNotification,
+  visualListTypeDisplay,
 } from '../../services/Libs';
 import { FilterOptions } from '../../typings/Enums';
 import { ReduxAction } from '../../typings/ReduxConstants';
@@ -42,7 +43,10 @@ const createSummary = (cleanupObj: ActivityLog) => {
   };
 };
 
-const createDetailedSummary = (cleanReasonObjects: CleanReasonObject[]) => {
+const createDetailedSummary = (
+  settings: MapToSettingObject,
+  cleanReasonObjects: CleanReasonObject[],
+) => {
   const mapDomainToCookieNames: { [domain: string]: CleanReasonObject[] } = {};
   cleanReasonObjects.forEach((obj) => {
     if (mapDomainToCookieNames[obj.cookie.hostname]) {
@@ -64,14 +68,20 @@ const createDetailedSummary = (cleanReasonObjects: CleanReasonObject[]) => {
         >
           {`${domain} (${cleanReasonObj
             .map((obj) => obj.cookie.name)
-            .join(', ')}): ${returnReasonMessages(cleanReasonObj[0])}`}
+            .join(', ')}): ${returnReasonMessages(
+            settings,
+            cleanReasonObj[0],
+          )}`}
         </div>
       );
     },
   );
 };
 
-const returnReasonMessages = (cleanReasonObject: CleanReasonObject) => {
+const returnReasonMessages = (
+  settings: MapToSettingObject,
+  cleanReasonObject: CleanReasonObject,
+) => {
   const { reason } = cleanReasonObject;
   const { hostname, mainDomain } = cleanReasonObject.cookie;
   const matchedExpression = cleanReasonObject.expression;
@@ -86,12 +96,17 @@ const returnReasonMessages = (cleanReasonObject: CleanReasonObject) => {
 
     case ReasonClean.NoMatchedExpression:
     case ReasonClean.StartupNoMatchedExpression: {
-      return browser.i18n.getMessage(reason, [hostname]);
+      return browser.i18n.getMessage(reason, [
+        hostname,
+        visualListTypeDisplay(settings, ListType.WHITE),
+        visualListTypeDisplay(settings, ListType.GREY),
+      ]);
     }
 
     case ReasonClean.StartupCleanupAndGreyList: {
       return browser.i18n.getMessage(reason, [
         matchedExpression ? matchedExpression.expression : '',
+        visualListTypeDisplay(settings, ListType.GREY),
       ]);
     }
 
@@ -99,9 +114,10 @@ const returnReasonMessages = (cleanReasonObject: CleanReasonObject) => {
     case ReasonKeep.MatchedExpression: {
       return browser.i18n.getMessage(reason, [
         matchedExpression ? matchedExpression.expression : '',
-        matchedExpression && matchedExpression.listType === ListType.GREY
-          ? browser.i18n.getMessage('greyListWordText')
-          : browser.i18n.getMessage('whiteListWordText'),
+        visualListTypeDisplay(
+          settings,
+          matchedExpression && matchedExpression.listType,
+        ),
       ]);
     }
 
@@ -150,8 +166,7 @@ const restoreCookies = async (
       if (obj.cookie.preparedCookieDomain.startsWith('file:')) {
         cadLog(
           {
-            msg:
-              'Cookie appears to come from a local file.  Cannot be restored normally.',
+            msg: 'Cookie appears to come from a local file.  Cannot be restored normally.',
             type: 'warn',
             x: obj.cookie,
           },
@@ -216,8 +231,7 @@ const restoreCookies = async (
       );
       cadLog(
         {
-          msg:
-            'An Error occurred while trying to restore cookie(s).  The rest of the cookies to restore are not processed.',
+          msg: 'An Error occurred while trying to restore cookie(s).  The rest of the cookies to restore are not processed.',
           type: 'error',
           x: e,
         },
@@ -351,7 +365,10 @@ const ActivityTable: React.FunctionComponent<ActivityTableProps> = (props) => {
                           ({storeId})
                         </h6>
                       )}
-                      {createDetailedSummary(cleanReasonObjects)}
+                      {createDetailedSummary(
+                        state.settings,
+                        cleanReasonObjects,
+                      )}
                     </div>
                   );
                 })}

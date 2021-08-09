@@ -31,6 +31,7 @@ import {
   showNotification,
   siteDataToBrowser,
   SITEDATATYPES,
+  visualListTypeDisplay,
 } from './Libs';
 import StoreUser from './StoreUser';
 
@@ -65,13 +66,9 @@ export default class ContextMenuEvents extends StoreUser {
 
   public static menuInit(): void {
     if (!browser.contextMenus) return;
-    if (
-      !getSetting(
-        StoreUser.store.getState(),
-        SettingID.CONTEXT_MENUS,
-      ) as boolean
-    )
-      return;
+    const state = StoreUser.store.getState();
+    const { settings } = state;
+    if (!getSetting(state, SettingID.CONTEXT_MENUS) as boolean) return;
     if (ContextMenuEvents.isInitialized) return;
     ContextMenuEvents.isInitialized = true;
     // Clean Option Group
@@ -132,13 +129,19 @@ export default class ContextMenuEvents extends StoreUser {
       contexts: ['link'],
       id: ContextMenuEvents.MenuID.LINK_ADD_GREY_DOMAIN,
       parentId: ContextMenuEvents.MenuID.PARENT_LINK_DOMAIN,
-      title: browser.i18n.getMessage('toGreyListText'),
+      title: browser.i18n.getMessage(
+        'toRestartListText',
+        visualListTypeDisplay(settings, ListType.GREY),
+      ),
     });
     ContextMenuEvents.menuCreate({
       contexts: ['link'],
       id: ContextMenuEvents.MenuID.LINK_ADD_WHITE_DOMAIN,
       parentId: ContextMenuEvents.MenuID.PARENT_LINK_DOMAIN,
-      title: browser.i18n.getMessage('toWhiteListText'),
+      title: browser.i18n.getMessage(
+        'toKeepListText',
+        visualListTypeDisplay(settings, ListType.WHITE),
+      ),
     });
     ContextMenuEvents.menuCreate({
       contexts: ['link'],
@@ -150,13 +153,19 @@ export default class ContextMenuEvents extends StoreUser {
       contexts: ['link'],
       id: ContextMenuEvents.MenuID.LINK_ADD_GREY_SUBS,
       parentId: ContextMenuEvents.MenuID.PARENT_LINK_SUBS,
-      title: browser.i18n.getMessage('toGreyListText'),
+      title: browser.i18n.getMessage(
+        'toRestartListText',
+        visualListTypeDisplay(settings, ListType.GREY),
+      ),
     });
     ContextMenuEvents.menuCreate({
       contexts: ['link'],
       id: ContextMenuEvents.MenuID.LINK_ADD_WHITE_SUBS,
       parentId: ContextMenuEvents.MenuID.PARENT_LINK_SUBS,
-      title: browser.i18n.getMessage('toWhiteListText'),
+      title: browser.i18n.getMessage(
+        'toKeepListText',
+        visualListTypeDisplay(settings, ListType.WHITE),
+      ),
     });
     // Page Group
     ContextMenuEvents.menuCreate({
@@ -169,13 +178,19 @@ export default class ContextMenuEvents extends StoreUser {
       contexts: ['page'],
       id: ContextMenuEvents.MenuID.PAGE_ADD_GREY_DOMAIN,
       parentId: ContextMenuEvents.MenuID.PARENT_PAGE_DOMAIN,
-      title: browser.i18n.getMessage('toGreyListText'),
+      title: browser.i18n.getMessage(
+        'toRestartListText',
+        visualListTypeDisplay(settings, ListType.GREY),
+      ),
     });
     ContextMenuEvents.menuCreate({
       contexts: ['page'],
       id: ContextMenuEvents.MenuID.PAGE_ADD_WHITE_DOMAIN,
       parentId: ContextMenuEvents.MenuID.PARENT_PAGE_DOMAIN,
-      title: browser.i18n.getMessage('toWhiteListText'),
+      title: browser.i18n.getMessage(
+        'toKeepListText',
+        visualListTypeDisplay(settings, ListType.WHITE),
+      ),
     });
     ContextMenuEvents.menuCreate({
       contexts: ['page'],
@@ -187,13 +202,19 @@ export default class ContextMenuEvents extends StoreUser {
       contexts: ['page'],
       id: ContextMenuEvents.MenuID.PAGE_ADD_GREY_SUBS,
       parentId: ContextMenuEvents.MenuID.PARENT_PAGE_SUBS,
-      title: browser.i18n.getMessage('toGreyListText'),
+      title: browser.i18n.getMessage(
+        'toRestartListText',
+        visualListTypeDisplay(settings, ListType.GREY),
+      ),
     });
     ContextMenuEvents.menuCreate({
       contexts: ['page'],
       id: ContextMenuEvents.MenuID.PAGE_ADD_WHITE_SUBS,
       parentId: ContextMenuEvents.MenuID.PARENT_PAGE_SUBS,
-      title: browser.i18n.getMessage('toWhiteListText'),
+      title: browser.i18n.getMessage(
+        'toKeepListText',
+        visualListTypeDisplay(settings, ListType.WHITE),
+      ),
     });
     // Selection Group
     ContextMenuEvents.menuCreate({
@@ -206,13 +227,19 @@ export default class ContextMenuEvents extends StoreUser {
       contexts: ['selection'],
       id: ContextMenuEvents.MenuID.SELECT_ADD_GREY_DOMAIN,
       parentId: ContextMenuEvents.MenuID.PARENT_SELECT_DOMAIN,
-      title: browser.i18n.getMessage('toGreyListText'),
+      title: browser.i18n.getMessage(
+        'toRestartListText',
+        visualListTypeDisplay(settings, ListType.GREY),
+      ),
     });
     ContextMenuEvents.menuCreate({
       contexts: ['selection'],
       id: ContextMenuEvents.MenuID.SELECT_ADD_WHITE_DOMAIN,
       parentId: ContextMenuEvents.MenuID.PARENT_SELECT_DOMAIN,
-      title: browser.i18n.getMessage('toWhiteListText'),
+      title: browser.i18n.getMessage(
+        'toKeepListText',
+        visualListTypeDisplay(settings, ListType.WHITE),
+      ),
     });
     ContextMenuEvents.menuCreate({
       contexts: ['selection'],
@@ -226,13 +253,19 @@ export default class ContextMenuEvents extends StoreUser {
       contexts: ['selection'],
       id: ContextMenuEvents.MenuID.SELECT_ADD_GREY_SUBS,
       parentId: ContextMenuEvents.MenuID.PARENT_SELECT_SUBS,
-      title: browser.i18n.getMessage('toGreyListText'),
+      title: browser.i18n.getMessage(
+        'toRestartListText',
+        visualListTypeDisplay(settings, ListType.GREY),
+      ),
     });
     ContextMenuEvents.menuCreate({
       contexts: ['selection'],
       id: ContextMenuEvents.MenuID.SELECT_ADD_WHITE_SUBS,
       parentId: ContextMenuEvents.MenuID.PARENT_SELECT_SUBS,
-      title: browser.i18n.getMessage('toWhiteListText'),
+      title: browser.i18n.getMessage(
+        'toKeepListText',
+        visualListTypeDisplay(settings, ListType.WHITE),
+      ),
     });
     // Separator
     ContextMenuEvents.menuCreate({
@@ -240,10 +273,7 @@ export default class ContextMenuEvents extends StoreUser {
     });
     // Active Mode
     ContextMenuEvents.menuCreate({
-      checked: getSetting(
-        StoreUser.store.getState(),
-        SettingID.ACTIVE_MODE,
-      ) as boolean,
+      checked: getSetting(state, SettingID.ACTIVE_MODE) as boolean,
       id: ContextMenuEvents.MenuID.ACTIVE_MODE,
       title: browser.i18n.getMessage('activeModeText'),
       type: 'checkbox',
@@ -333,12 +363,10 @@ export default class ContextMenuEvents extends StoreUser {
     info: browser.contextMenus.OnClickData,
     tab: browser.tabs.Tab,
   ): Promise<void> {
-    const debug = getSetting(
-      StoreUser.store.getState(),
-      SettingID.DEBUG_MODE,
-    ) as boolean;
+    const state = StoreUser.store.getState();
+    const debug = getSetting(state, SettingID.DEBUG_MODE) as boolean;
     const contextualIdentities = getSetting(
-      StoreUser.store.getState(),
+      state,
       SettingID.CONTEXTUAL_IDENTITIES,
     ) as boolean;
     cadLog(
@@ -369,10 +397,7 @@ export default class ContextMenuEvents extends StoreUser {
           debug,
         );
         showNotification({
-          duration: getSetting(
-            StoreUser.store.getState(),
-            SettingID.NOTIFY_DURATION,
-          ) as number,
+          duration: getSetting(state, SettingID.NOTIFY_DURATION) as number,
           msg: `${browser.i18n.getMessage('manualCleanError', [
             browser.i18n.getMessage(
               `${siteDataToBrowser(siteData as SiteDataType)}Text`,
@@ -391,7 +416,7 @@ export default class ContextMenuEvents extends StoreUser {
         debug,
       );
       if (siteData === 'Cookies') {
-        await clearCookiesForThisDomain(StoreUser.store.getState(), tab);
+        await clearCookiesForThisDomain(state, tab);
         return;
       }
       switch (siteData) {
@@ -400,14 +425,10 @@ export default class ContextMenuEvents extends StoreUser {
         case SiteDataType.INDEXEDDB:
         case SiteDataType.PLUGINDATA:
         case SiteDataType.SERVICEWORKERS:
-          await clearSiteDataForThisDomain(
-            StoreUser.store.getState(),
-            siteData,
-            hostname,
-          );
+          await clearSiteDataForThisDomain(state, siteData, hostname);
           break;
         case SiteDataType.LOCALSTORAGE:
-          await clearLocalStorageForThisDomain(StoreUser.store.getState(), tab);
+          await clearLocalStorageForThisDomain(state, tab);
           break;
         default:
           cadLog(
@@ -812,12 +833,10 @@ export default class ContextMenuEvents extends StoreUser {
     listType: ListType,
     cookieStoreId: string | undefined,
   ): void {
+    const state = StoreUser.store.getState();
     if (input.trim() === '' || input === '*.') {
       showNotification({
-        duration: getSetting(
-          StoreUser.store.getState(),
-          SettingID.NOTIFY_DURATION,
-        ) as number,
+        duration: getSetting(state, SettingID.NOTIFY_DURATION) as number,
         msg: `${browser.i18n.getMessage('addNewExpressionNotificationFailed')}`,
       });
       return;
@@ -826,10 +845,7 @@ export default class ContextMenuEvents extends StoreUser {
       expression: localFileToRegex(input.trim()),
       listType,
       storeId: parseCookieStoreId(
-        getSetting(
-          StoreUser.store.getState(),
-          SettingID.CONTEXTUAL_IDENTITIES,
-        ) as boolean,
+        getSetting(state, SettingID.CONTEXTUAL_IDENTITIES) as boolean,
         cookieStoreId,
       ),
     };
@@ -838,22 +854,16 @@ export default class ContextMenuEvents extends StoreUser {
         msg: `background.addNewExpression - Parsed from Right-Click:`,
         x: payload,
       },
-      getSetting(StoreUser.store.getState(), SettingID.DEBUG_MODE) as boolean,
+      getSetting(state, SettingID.DEBUG_MODE) as boolean,
     );
-    const cache = StoreUser.store.getState().cache;
+    const cache = state.cache;
     showNotification({
-      duration: getSetting(
-        StoreUser.store.getState(),
-        SettingID.NOTIFY_DURATION,
-      ) as number,
+      duration: getSetting(state, SettingID.NOTIFY_DURATION) as number,
       msg: `${browser.i18n.getMessage('addNewExpressionNotification', [
         payload.expression,
-        payload.listType,
+        visualListTypeDisplay(state.settings, payload.listType),
         `${payload.storeId}${
-          (getSetting(
-            StoreUser.store.getState(),
-            SettingID.CONTEXTUAL_IDENTITIES,
-          ) as boolean)
+          (getSetting(state, SettingID.CONTEXTUAL_IDENTITIES) as boolean)
             ? cache[payload.storeId] !== undefined
               ? ` (${cache[payload.storeId]})`
               : ''

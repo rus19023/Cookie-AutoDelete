@@ -11,7 +11,11 @@
  * SOFTWARE.
  */
 
-import { getHostname, returnMatchedExpressionObject } from './Libs';
+import {
+  getHostname,
+  returnMatchedExpressionObject,
+  visualListTypeDisplay,
+} from './Libs';
 
 // Show the # of cookies in icon
 export const showNumberOfCookiesInIcon = (
@@ -54,7 +58,10 @@ export const showNumberOfCookiesInTitle = async (
   );
   const newData = {
     cookies: otherInfo.cookieLength || (curData && curData[2]) || 0,
-    list: otherInfo.listType || (curData && curData[1]) || 'NO LIST',
+    list:
+      otherInfo.listType ||
+      (curData && curData[1]) ||
+      browser.i18n.getMessage('noListText'),
   };
 
   browser.browserAction.setTitle({
@@ -151,19 +158,14 @@ export const checkIfProtected = async (
       getHostname(aTab.url || ''),
     );
 
-    if (matchedExpression) {
-      showNumberOfCookiesInTitle(aTab, {
-        platformOS: state.cache.platformOs,
-        listType: matchedExpression.listType,
-        cookieLength,
-      });
-    } else {
-      showNumberOfCookiesInTitle(aTab, {
-        platformOS: state.cache.platformOs,
-        listType: 'NO LIST',
-        cookieLength,
-      });
-    }
+    showNumberOfCookiesInTitle(aTab, {
+      platformOS: state.cache.platformOS,
+      listType: visualListTypeDisplay(
+        state.settings,
+        matchedExpression && matchedExpression.listType,
+      ),
+      cookieLength,
+    });
 
     // Can't set icons on Android.
     if (state.cache.platformOs && state.cache.platformOs === 'android') return;

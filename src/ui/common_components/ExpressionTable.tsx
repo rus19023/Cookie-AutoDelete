@@ -15,7 +15,11 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import shortid from 'shortid';
 import { removeExpressionUI, updateExpressionUI } from '../../redux/Actions';
-import { sleep, validateExpressionDomain } from '../../services/Libs';
+import {
+  sleep,
+  validateExpressionDomain,
+  visualListTypeDisplay,
+} from '../../services/Libs';
 import { ReduxAction } from '../../typings/ReduxConstants';
 import ExpressionOptions from './ExpressionOptions';
 import IconButton from './IconButton';
@@ -35,12 +39,16 @@ interface OwnProps {
   emptyElement: JSX.Element;
 }
 
+interface StateProps {
+  settings: MapToSettingObject;
+}
+
 interface DispatchProps {
   onRemoveExpression: (payload: Expression) => void;
   onUpdateExpression: (payload: Expression) => void;
 }
 
-type ExpressionTableProps = DispatchProps & OwnProps;
+type ExpressionTableProps = DispatchProps & StateProps & OwnProps;
 
 class ExpressionTable extends Component<ExpressionTableProps, EmptyState> {
   private editInput: HTMLInputElement | undefined | null;
@@ -119,6 +127,7 @@ class ExpressionTable extends Component<ExpressionTableProps, EmptyState> {
       onUpdateExpression,
       expressionColumnTitle,
       emptyElement,
+      settings,
     } = this.props;
     const { editMode, id, expressionInput, invalid } = this.state;
     const expressions =
@@ -193,18 +202,17 @@ class ExpressionTable extends Component<ExpressionTableProps, EmptyState> {
                     verticalAlign: 'middle',
                   }}
                 >
-                  {`${
-                    expression.listType === 'WHITE'
-                      ? browser.i18n.getMessage('whiteListWordText')
-                      : browser.i18n.getMessage('greyListWordText')
-                  }`}
+                  {visualListTypeDisplay(settings, expression.listType)}
                 </div>
                 <IconButton
-                  title={`${
-                    expression.listType === 'WHITE'
-                      ? browser.i18n.getMessage('toggleToGreyListWordText')
-                      : browser.i18n.getMessage('toggleToWhiteListWordText')
-                  }`}
+                  title={browser.i18n.getMessage('toggleToWordText', [
+                    visualListTypeDisplay(
+                      settings,
+                      expression.listType === ListType.GREY
+                        ? ListType.WHITE
+                        : ListType.GREY,
+                    ),
+                  ])}
                   iconName="exchange-alt"
                   className="btn-outline-dark showOnRowHover"
                   styleReact={{
@@ -243,6 +251,11 @@ class ExpressionTable extends Component<ExpressionTableProps, EmptyState> {
   }
 }
 
+const mapStateToProps = (state: State) => {
+  const { settings } = state;
+  return { settings };
+};
+
 const mapDispatchToProps = (dispatch: Dispatch<ReduxAction>) => ({
   onRemoveExpression(payload: Expression) {
     dispatch(removeExpressionUI(payload));
@@ -251,4 +264,4 @@ const mapDispatchToProps = (dispatch: Dispatch<ReduxAction>) => ({
     dispatch(updateExpressionUI(payload));
   },
 });
-export default connect(null, mapDispatchToProps)(ExpressionTable);
+export default connect(mapStateToProps, mapDispatchToProps)(ExpressionTable);

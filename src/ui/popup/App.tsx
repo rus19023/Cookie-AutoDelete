@@ -29,6 +29,7 @@ import {
   isFirefoxNotAndroid,
   localFileToRegex,
   parseCookieStoreId,
+  visualListTypeDisplay,
 } from '../../services/Libs';
 import { FilterOptions } from '../../typings/Enums';
 import { ReduxAction } from '../../typings/ReduxConstants';
@@ -392,8 +393,11 @@ class App extends Component<PopupAppComponentProps, InitialState> {
                   });
                 }}
                 iconName="plus"
-                title={browser.i18n.getMessage('toGreyListText')}
-                text={browser.i18n.getMessage('greyListWordText')}
+                title={browser.i18n.getMessage(
+                  'toRestartListText',
+                  visualListTypeDisplay(settings, ListType.GREY),
+                )}
+                text={visualListTypeDisplay(settings, ListType.GREY)}
               />
 
               <IconButton
@@ -406,8 +410,11 @@ class App extends Component<PopupAppComponentProps, InitialState> {
                   });
                 }}
                 iconName="plus"
-                title={browser.i18n.getMessage('toWhiteListText')}
-                text={browser.i18n.getMessage('whiteListWordText')}
+                title={browser.i18n.getMessage(
+                  'toKeepListText',
+                  visualListTypeDisplay(settings, ListType.WHITE),
+                )}
+                text={visualListTypeDisplay(settings, ListType.WHITE)}
               />
             </div>
           </div>

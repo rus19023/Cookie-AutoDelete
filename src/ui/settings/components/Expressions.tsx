@@ -23,6 +23,7 @@ import {
   getMatchedExpressions,
   getSetting,
   validateExpressionDomain,
+  visualListTypeDisplay,
 } from '../../../services/Libs';
 import { ReduxAction } from '../../../typings/ReduxConstants';
 import ExpressionTable from '../../common_components/ExpressionTable';
@@ -50,6 +51,7 @@ interface StateProps {
   contextualIdentities: boolean;
   debug: boolean;
   lists: StoreIdToExpressionList;
+  settings: MapToSettingObject;
 }
 
 interface DispatchProps {
@@ -61,7 +63,7 @@ interface DispatchProps {
 type ExpressionProps = OwnProps & StateProps & DispatchProps;
 
 class InitialState {
-  public contextualIdentitiesObjects: browser.contextualIdentities.ContextualIdentity[] = [];
+  public containerObjs: browser.contextualIdentities.ContextualIdentity[] = [];
   public error = '';
   public expressionInput = '';
   public storeId = 'default';
@@ -158,7 +160,7 @@ class Expressions extends React.Component<ExpressionProps> {
 
   // Add the expression using the + button or the Enter key
   public addExpressionByInput(payload: Expression) {
-    const { onNewExpression } = this.props;
+    const { onNewExpression, settings } = this.props;
     const exps = this.parseRawExpression(payload);
     const invalidInputs: string[] = [];
     const inputReasons: string[] = [];
@@ -186,9 +188,7 @@ class Expressions extends React.Component<ExpressionProps> {
         validInputs.length > 0
           ? `${browser.i18n.getMessage('inputAddSuccess', [
               validInputs.length.toString(),
-              browser.i18n.getMessage(
-                `${payload.listType.toLowerCase()}ListWordText`,
-              ),
+              visualListTypeDisplay(settings, payload.listType),
             ])}\n${validInputs.join(', ')}`
           : '',
       error:
@@ -301,12 +301,10 @@ class Expressions extends React.Component<ExpressionProps> {
 
   public createDefaultOptions() {
     const { bName, contextualIdentities, lists, onNewExpression } = this.props;
-    const { contextualIdentitiesObjects } = this.state;
+    const { containerObjs } = this.state;
     const containers = new Set<string>(Object.keys(lists));
     if (contextualIdentities) {
-      contextualIdentitiesObjects.forEach((c) =>
-        containers.add(c.cookieStoreId),
-      );
+      containerObjs.forEach((c) => containers.add(c.cookieStoreId));
     }
     containers.add(
       ((browser) => {
@@ -346,26 +344,22 @@ class Expressions extends React.Component<ExpressionProps> {
 
   public async componentDidMount() {
     if (this.props.contextualIdentities) {
-      const contextualIdentitiesObjects = await browser.contextualIdentities.query(
-        {},
-      );
-      this.setState({
-        contextualIdentitiesObjects,
-      });
+      const containerObjs = await browser.contextualIdentities.query({});
+      this.setState({ containerObjs });
     }
   }
 
   public render() {
-    const { style, lists, contextualIdentities } = this.props;
-    const { error, contextualIdentitiesObjects, storeId, success } = this.state;
+    const { style, lists, contextualIdentities, settings } = this.props;
+    const { error, containerObjs, storeId, success } = this.state;
     const mapIDtoName: { [k: string]: string | undefined } = {};
     if (contextualIdentities) {
-      contextualIdentitiesObjects.forEach((c) => {
+      containerObjs.forEach((c) => {
         mapIDtoName[c.cookieStoreId] = c.name;
       });
       Object.keys(lists).forEach((list) => {
         if (list === 'default') return;
-        const container = contextualIdentitiesObjects.find((c) => {
+        const container = containerObjs.find((c) => {
           return c.cookieStoreId === list;
         });
         if (!container) {
@@ -529,8 +523,11 @@ class Expressions extends React.Component<ExpressionProps> {
               }}
               styleReact={styles.buttonStyle}
               iconName="plus"
-              title={browser.i18n.getMessage('toGreyListText')}
-              text={browser.i18n.getMessage('greyListWordText')}
+              title={browser.i18n.getMessage(
+                'toRestartListText',
+                visualListTypeDisplay(settings, ListType.GREY),
+              )}
+              text={visualListTypeDisplay(settings, ListType.GREY)}
             />
 
             <IconButton
@@ -544,8 +541,11 @@ class Expressions extends React.Component<ExpressionProps> {
               }}
               styleReact={styles.buttonStyle}
               iconName="plus"
-              title={browser.i18n.getMessage('toWhiteListText')}
-              text={browser.i18n.getMessage('whiteListWordText')}
+              title={browser.i18n.getMessage(
+                'toKeepListText',
+                visualListTypeDisplay(settings, ListType.WHITE),
+              )}
+              text={visualListTypeDisplay(settings, ListType.WHITE)}
             />
           </div>
         </div>
@@ -657,7 +657,7 @@ class Expressions extends React.Component<ExpressionProps> {
 }
 
 const mapStateToProps = (state: State) => {
-  const { cache, lists } = state;
+  const { cache, lists, settings } = state;
   return {
     bName: cache.browserDetect || (browserDetect() as browserName),
     cache,
@@ -667,6 +667,7 @@ const mapStateToProps = (state: State) => {
     ) as boolean,
     debug: getSetting(state, SettingID.DEBUG_MODE) as boolean,
     lists,
+    settings,
   };
 };
 

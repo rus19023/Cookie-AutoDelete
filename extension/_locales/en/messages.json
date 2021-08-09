@@ -290,8 +290,14 @@
     "description": "Enable Context Menus (Right-Click Menu). Shown in CAD Settings"
   },
   "enableGreyListCleanup": {
-    "message": "Enable Greylist Cleanup on Browser Restart",
-    "description": "Enable Greylist Cleanup on Browser Restart"
+    "message": "Enable $greylist$ Cleanup on Browser Restart",
+    "description": "Enable $greylist$ Cleanup on Browser Restart",
+    "placeholders": {
+      "greylist": {
+        "content": "$1",
+        "example": "greylist -or- its custom value"
+      }
+    }
   },
   "enableNewVersionPopup": {
     "message": "Enable Popup when New Version is Released",
@@ -457,7 +463,7 @@
       },
       "listType": {
         "content": "$2",
-        "example": "GreyList"
+        "example": "GreyList -or- WhiteList -or- its custom value"
       }
     }
   },
@@ -715,6 +721,10 @@
     "message": "No expressions defined.",
     "description": "No expressions defined."
   },
+  "noListText": {
+    "message": "NO LIST",
+    "description": "NO LIST - used in icon hover/mouseover text when current site is not in any lists."
+  },
   "noPrivateLogging": {
     "message": "Cleanup Logs will not be generated for tabs in Private Browsing / Incognito / InPrivate.",
     "description": "Cleanup Logs will not be generated for tabs in Private Browsing / Incognito / InPrivate."
@@ -835,37 +845,57 @@
       },
       "listType": {
         "content": "$2",
-        "example": "Whitelist"
+        "example": "WhiteList -or- GreyList -or- its custom value"
       }
     }
   },
   "reasonCleanGreyList": {
-    "message": "Clean because of startup cleanup and $matchedExpression$ is in the Greylist",
-    "description": "Clean because of startup cleanup and $matchedExpression$ is in the Greylist. Used in cleanup log.",
+    "message": "Clean because of startup cleanup and $matchedExpression$ is in the $restartlist$",
+    "description": "Clean because of startup cleanup and $matchedExpression$ is in the $restartlist$. Used in cleanup log.",
     "placeholders": {
       "matchedExpression": {
         "content": "$1",
         "example": "*.google.com"
+      },
+      "restartlist": {
+        "content": "$2",
+        "example": "greylist -or- custom value relating to clean on browser restart"
       }
     }
   },
   "reasonCleanNoList": {
-    "message": "Clean because $hostname$ is not in the White or Grey lists",
+    "message": "Clean because $hostname$ is not in the $keep$ or $restart$ lists",
     "description": "Clean because $hostname$ is not in the White or Grey lists",
     "placeholders": {
       "hostname": {
         "content": "$1",
         "example": "sub.google.com"
+      },
+      "keep": {
+        "content": "$2",
+        "example": "whitelist -or- custom value relating to never clean"
+      },
+      "restart": {
+        "content": "$3",
+        "example": "greylist -or- custom value relating to clean on browser restart"
       }
     }
   },
   "reasonCleanStartupNoList": {
-    "message": "Clean because of startup cleanup and $hostname$ is not in the White or Grey lists",
+    "message": "Clean because of startup cleanup and $hostname$ is not in the $keep$ or $restart$ lists",
     "description": "Clean because of startup cleanup and $hostname$ is not in the White or Grey lists",
     "placeholders": {
       "hostname": {
         "content": "$1",
         "example": "sub.google.com"
+      },
+      "keep": {
+        "content": "$2",
+        "example": "whitelist -or- custom value relating to never clean"
+      },
+      "restart": {
+        "content": "$3",
+        "example": "greylist -or- custom value relating to clean on browser restart"
       }
     }
   },
@@ -1053,25 +1083,39 @@
     "message": "Success!",
     "description": "Success!"
   },
-  "toGreyListText": {
-    "message": "Add to Greylist (Clean on Browser Restart)",
-    "description": "Add to Greylist (Clean on Browser Restart)"
+  "toKeepListText": {
+    "message": "Add to $listName$ (Never Clean)",
+    "description": "Add to $listName$ (Never Clean) - This utilizes the custom listName that users can substitute in from 'whitelist'",
+    "placeholders": {
+      "listName": {
+        "content": "$1",
+        "example": "whitelist -or- custom value relating to never clean"
+      }
+    }
   },
-  "toWhiteListText": {
-    "message": "Add to Whitelist (Never Clean)",
-    "description": "Add to Whitelist (Never Clean)"
+  "toRestartListText": {
+    "message": "Add to $listName$ (Clean on Browser Restart)",
+    "description": "Add to $listName$ (Clean on Browser Restart) - This utilizes the custom listName that users can substitute in from 'greylist'",
+    "placeholders": {
+      "listName": {
+        "content": "$1",
+        "example": "greylist -or- custom value relating to clean on browser restart"
+      }
+    }
   },
   "toggleNotificationText": {
     "message": "Toggle to enable or disable notifications",
     "description": "Toggle to enable or disable notifications"
   },
-  "toggleToGreyListWordText": {
-    "message": "Toggle to greylist",
-    "description": "Toggle to greylist"
-  },
-  "toggleToWhiteListWordText": {
-    "message": "Toggle to whitelist",
-    "description": "Toggle to whitelist"
+  "toggleToWordText": {
+    "message": "Toggle to $list$",
+    "description": "Toggle to $list$ - mainly in Expression Table on the right-most column",
+    "placeholders": {
+      "list": {
+        "content": "$1",
+        "example": "GreyList -or- WhiteList -or- custom value of either lists"
+      }
+    }
   },
   "versionNumberText": {
     "message": "$CAD$ version",
