@@ -243,7 +243,12 @@ class Settings extends React.Component<SettingProps> {
     this.setState(new EmptyState());
   }
 
-  public genEditableTextSetting(sid: SettingID, def: string, label?: string) {
+  public genEditableTextSetting(
+    sid: SettingID,
+    def: string,
+    label?: string,
+    tooltip?: string,
+  ) {
     return (
       <TextInputEditable
         altEditClear={browser.i18n.getMessage('stopEditingText')}
@@ -262,6 +267,7 @@ class Settings extends React.Component<SettingProps> {
         onEditClear={() => this.clearEdit()}
         onEditSave={() => this.commitEdit()}
         onEditStart={() => this.startEditing(sid, def)}
+        tooltipHref={tooltip}
         text={label}
         value={this.props.settings[sid].value.toString()}
       />
@@ -688,6 +694,7 @@ class Settings extends React.Component<SettingProps> {
                   'visualTextChangeText',
                   browser.i18n.getMessage('greyListWordText'),
                 ),
+                '#override-visual-text',
               )}
             </div>
             <div
@@ -701,6 +708,7 @@ class Settings extends React.Component<SettingProps> {
                   'visualTextChangeText',
                   browser.i18n.getMessage('whiteListWordText'),
                 ),
+                '#override-visual-text',
               )}
             </div>
           </div>

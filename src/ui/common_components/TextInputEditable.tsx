@@ -11,6 +11,7 @@
  * SOFTWARE.
  */
 import * as React from 'react';
+import SettingsTooltip from '../settings/components/SettingsTooltip';
 import { moveCaretToEnd } from '../UILibs';
 import IconButton from './IconButton';
 interface OwnProps {
@@ -27,9 +28,31 @@ interface OwnProps {
   onEditSave: () => void;
   onEditStart: () => void;
   text?: string;
+  tooltipHref?: string;
   type?: string;
   value?: string;
 }
+
+type TitleProps = Pick<OwnProps, 'name' | 'text' | 'tooltipHref'>;
+
+const TextInputTitle: React.FunctionComponent<TitleProps> = ({
+  name,
+  text,
+  tooltipHref,
+}) => {
+  return (
+    <div className="textInputTitle">
+      {text && text.length > 0 && (
+        <label htmlFor={name} aria-labelledby={name}>
+          {text}
+        </label>
+      )}
+      {tooltipHref && tooltipHref.length > 0 && (
+        <SettingsTooltip hrefURL={tooltipHref} />
+      )}
+    </div>
+  );
+};
 
 function TextInputEditable(
   props: React.PropsWithChildren<OwnProps>,
@@ -49,16 +72,13 @@ function TextInputEditable(
     onEditSave,
     onEditStart,
     text,
+    tooltipHref,
     type,
     value,
   } = props;
   return canEdit ? (
     <div className="editableTextInput">
-      {text && text.length > 0 && (
-        <label htmlFor={name} aria-labelledby={name}>
-          {text}
-        </label>
-      )}
+      <TextInputTitle name={name} text={text} tooltipHref={tooltipHref} />
       <input
         id={name}
         name={name}
@@ -104,11 +124,7 @@ function TextInputEditable(
     </div>
   ) : (
     <div>
-      {text && text.length > 0 && (
-        <label htmlFor={name} aria-labelledby={name}>
-          {text}
-        </label>
-      )}
+      <TextInputTitle name={name} text={text} tooltipHref={tooltipHref} />
       <textarea
         id={name}
         name={name}
