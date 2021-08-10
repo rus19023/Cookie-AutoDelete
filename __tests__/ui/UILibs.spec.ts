@@ -17,6 +17,7 @@ import { advanceTo, clear } from 'jest-date-mock';
 import {
   appendDynamicTimestamp,
   downloadObjectAsJSON,
+  moveCaretToEnd,
 } from '../../src/ui/UILibs';
 
 describe('appendDynamicTimestamp', () => {
@@ -59,5 +60,14 @@ describe('downloadObjectAsJSON', () => {
       downloadName: 'CAD_TestExport_2020-05-08_01.23.45.json',
       status: true,
     });
+  });
+});
+
+describe('moveCaretToEnd', () => {
+  it('should work...', () => {
+    expect.assertions(1);
+    const testObj = { target: { value: 'example.com' } };
+    moveCaretToEnd(testObj);
+    expect(testObj).toMatchObject(testObj);
   });
 });

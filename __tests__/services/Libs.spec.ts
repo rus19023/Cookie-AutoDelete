@@ -47,6 +47,7 @@ import {
   trimDot,
   undefinedIsTrue,
   validateExpressionDomain,
+  visualListTypeDisplay,
 } from '../../src/services/Libs';
 
 import ipaddr from 'ipaddr.js';
@@ -168,8 +169,7 @@ describe('Library Functions', () => {
       expect(consoleOutput).toEqual([
         {
           type: 'error',
-          msg:
-            'CAD_0.12.34 - Invalid Console Output Type given [ invalid ].  Using [debug] instead.',
+          msg: 'CAD_0.12.34 - Invalid Console Output Type given [ invalid ].  Using [debug] instead.',
         },
         { type: 'debug', msg: 'CAD_0.12.34 - debug - invalidType\n' },
       ]);
@@ -189,13 +189,11 @@ describe('Library Functions', () => {
       expect(consoleOutput).toEqual([
         {
           type: 'warn',
-          msg:
-            'CAD_0.12.34 - Received unexpected typeof [ function ].  Attempting to display it...',
+          msg: 'CAD_0.12.34 - Received unexpected typeof [ function ].  Attempting to display it...',
         },
         {
           type: 'debug',
-          msg:
-            'CAD_0.12.34 - debug - objectFunction\nfunction toString() { [native code] }',
+          msg: 'CAD_0.12.34 - debug - objectFunction\nfunction toString() { [native code] }',
         },
       ]);
     });
@@ -1310,14 +1308,9 @@ describe('Library Functions', () => {
     });
 
     it('should return cleanup domains from example.com', () => {
-      expect(
-        prepareCleanupDomains('example.com', browserName.Firefox),
-      ).toEqual([
-        'example.com',
-        '.example.com',
-        'www.example.com',
-        '.www.example.com',
-      ]);
+      expect(prepareCleanupDomains('example.com', browserName.Firefox)).toEqual(
+        ['example.com', '.example.com', 'www.example.com', '.www.example.com'],
+      );
     });
 
     it('should return cleanup domains from example.com for Chrome', () => {
@@ -1699,9 +1692,10 @@ describe('Library Functions', () => {
     });
     it('should return invalid message on invalid RegExp', () => {
       validateExpressionDomain('/abc(def]/');
-      expect(
-        global.browser.i18n.getMessage,
-      ).toHaveBeenCalledWith('inputErrorRegExp', [expect.any(String)]);
+      expect(global.browser.i18n.getMessage).toHaveBeenCalledWith(
+        'inputErrorRegExp',
+        [expect.any(String)],
+      );
     });
     it('should return invalid message on start slash missing end slash', () => {
       validateExpressionDomain('/abc');
@@ -1736,6 +1730,57 @@ describe('Library Functions', () => {
       const r = validateExpressionDomain('/[Rr]eg[Ee]xp.com/');
       expect(global.browser.i18n.getMessage).not.toHaveBeenCalled();
       expect(r).toEqual('');
+    });
+  });
+
+  describe('visualListTypeDisplay()', () => {
+    when(global.browser.i18n.getMessage)
+      .calledWith(expect.any(String))
+      .mockReturnValue('message');
+    when(global.browser.i18n.getMessage)
+      .calledWith(expect.any(String), expect.any(Array))
+      .mockReturnValue(`message with substitution array`);
+    it('should return default text for greylist', () => {
+      visualListTypeDisplay(initialState.settings, ListType.GREY);
+      expect(global.browser.i18n.getMessage).toHaveBeenCalledWith(
+        'greyListWordText',
+      );
+    });
+    it('should return default text for whitelist', () => {
+      visualListTypeDisplay(initialState.settings, ListType.WHITE);
+      expect(global.browser.i18n.getMessage).toHaveBeenCalledWith(
+        'whiteListWordText',
+      );
+    });
+    it('should return default text for No List', () => {
+      visualListTypeDisplay(initialState.settings);
+      expect(global.browser.i18n.getMessage).toHaveBeenCalledWith('noListText');
+    });
+    it('should return custom value for greylist', () => {
+      const s = visualListTypeDisplay(
+        {
+          [SettingID.TEXT_GREY]: {
+            name: SettingID.TEXT_GREY,
+            value: 'RestartList',
+          },
+        },
+        ListType.GREY,
+      );
+      expect(s).toEqual('RestartList');
+      expect(global.browser.i18n.getMessage).not.toHaveBeenCalled();
+    });
+    it('should return custom value for whitelist', () => {
+      const s = visualListTypeDisplay(
+        {
+          [SettingID.TEXT_WHITE]: {
+            name: SettingID.TEXT_WHITE,
+            value: 'KeepList',
+          },
+        },
+        ListType.WHITE,
+      );
+      expect(s).toEqual('KeepList');
+      expect(global.browser.i18n.getMessage).not.toHaveBeenCalled();
     });
   });
 });
